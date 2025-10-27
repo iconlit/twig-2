@@ -1,24 +1,31 @@
-# Use PHP 8 with Apache
+# Use official PHP + Apache image
 FROM php:8.2-apache
 
-# Install system dependencies and PHP extensions
-RUN apt-get update && apt-get install -y libzip-dev unzip \
-    && docker-php-ext-install pdo pdo_mysql zip
-
-# Enable Apache mod_rewrite
+# Enable Apache mod_rewrite (needed for Twig routing)
 RUN a2enmod rewrite
 
-# Copy app files
-COPY . /var/www/html/
-
 # Set working directory
-WORKDIR /var/www/html/
+WORKDIR /var/www/html
 
-# Install composer
-COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+# Copy composer files and install dependencies
+COPY composer.json composer.lock ./
+RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" && \
+    php composer-setup.php --install-dir=/usr/local/bin --filename=composer && \
+    composer install --no-dev --optimize-autoloader && \
+    rm composer-setup.php
 
-# Install dependencies
-RUN composer install --no-dev --optimize-autoloader
+# Copy the rest of your app
+COPY . .
+
+# Set Apache DocumentRoot to 'public'
+RUN sed -i 's|/var/www/html|/var/www/html/public|g' /etc/apache2/sites-available/000-default.conf
+
+# Fix permissions
+RUN chown -R www-data:www-data /var/www/html
+RUN chmod -R 755 /var/www/html
 
 # Expose port 80
 EXPOSE 80
+
+# Start Apache in foreground
+CMD ["apache2-foreground"]

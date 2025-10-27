@@ -1,0 +1,10 @@
+# Enable URL rewriting
+RewriteEngine On
+
+# Redirect all requests to index.php (Twig front controller)
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^ index.php [QSA,L]
+
+# Optional: Set default index files
+DirectoryIndex index.php index.html
