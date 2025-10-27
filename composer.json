@@ -1,0 +1,7 @@
+{
+    "name": "ticketapp/twig",
+    "type": "project",
+    "require": {
+        "twig/twig": "^3.0"
+    }
+}
