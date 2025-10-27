@@ -24,13 +24,20 @@ class TicketController {
         echo $this->twig->render('pages/tickets.twig', [
             'tickets' => $tickets,
             'success' => Session::getFlash('success'),
-            'error' => Session::getFlash('error')
+            'error' => Session::getFlash('error'),
+            'csrf_token' => Session::generateCsrfToken()
         ]);
     }
 
     public function create() {
         if (!Session::get('user')) {
             echo json_encode(['success' => false, 'message' => 'Unauthorized']);
+            exit;
+        }
+
+        $csrfToken = $_POST['csrf_token'] ?? '';
+        if (!Session::validateCsrfToken($csrfToken)) {
+            echo json_encode(['success' => false, 'message' => 'Invalid CSRF token']);
             exit;
         }
 
@@ -51,6 +58,12 @@ class TicketController {
     public function update() {
         if (!Session::get('user')) {
             echo json_encode(['success' => false, 'message' => 'Unauthorized']);
+            exit;
+        }
+
+        $csrfToken = $_POST['csrf_token'] ?? '';
+        if (!Session::validateCsrfToken($csrfToken)) {
+            echo json_encode(['success' => false, 'message' => 'Invalid CSRF token']);
             exit;
         }
 
@@ -76,6 +89,12 @@ class TicketController {
     public function delete() {
         if (!Session::get('user')) {
             echo json_encode(['success' => false, 'message' => 'Unauthorized']);
+            exit;
+        }
+
+        $csrfToken = $_POST['csrf_token'] ?? '';
+        if (!Session::validateCsrfToken($csrfToken)) {
+            echo json_encode(['success' => false, 'message' => 'Invalid CSRF token']);
             exit;
         }
 

@@ -97,6 +97,7 @@
             <h3 id="modalTitle" class="text-lg leading-6 font-medium text-gray-900 dark:text-white mb-4">Create Ticket</h3>
             <form id="ticketForm" onsubmit="submitTicketForm(event)">
                 <input type="hidden" id="ticketId" name="id">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
                 <div class="mb-4">
                     <label for="title" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Title</label>
                     <input type="text" id="title" name="title" required class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
@@ -200,6 +201,11 @@ async function confirmDelete() {
     
     const formData = new FormData();
     formData.append('id', currentTicketId);
+    
+    const csrfTokenInput = document.querySelector('input[name="csrf_token"]');
+    if (csrfTokenInput) {
+        formData.append('csrf_token', csrfTokenInput.value);
+    }
     
     try {
         const response = await fetch('/tickets/delete', {

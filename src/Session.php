@@ -3,8 +3,17 @@
 class Session {
     public static function start() {
         if (session_status() === PHP_SESSION_NONE) {
+            ini_set('session.cookie_httponly', 1);
+            ini_set('session.cookie_samesite', 'Strict');
+            if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') {
+                ini_set('session.cookie_secure', 1);
+            }
             session_start();
         }
+    }
+
+    public static function regenerate() {
+        session_regenerate_id(true);
     }
 
     public static function get($key, $default = null) {
@@ -31,5 +40,16 @@ class Session {
 
     public static function setFlash($key, $value) {
         self::set($key, $value);
+    }
+
+    public static function generateCsrfToken() {
+        if (!self::get('csrf_token')) {
+            self::set('csrf_token', bin2hex(random_bytes(32)));
+        }
+        return self::get('csrf_token');
+    }
+
+    public static function validateCsrfToken($token) {
+        return hash_equals(self::get('csrf_token', ''), $token);
     }
 }

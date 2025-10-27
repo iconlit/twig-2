@@ -12,6 +12,11 @@ dist
 dist-ssr
 *.local
 
+# PHP
+vendor/
+composer.phar
+data/*.json
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
