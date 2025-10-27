@@ -3,10 +3,9 @@ FROM php:8.2-apache
 # Enable Apache mod_rewrite
 RUN a2enmod rewrite
 
-# Install system dependencies: zip, unzip, git, and PHP extensions
+# Install system dependencies: zip, unzip, git, PHP zip extension
 RUN apt-get update && apt-get install -y \
-    zip unzip git \
-    libzip-dev \
+    zip unzip git libzip-dev \
     && docker-php-ext-install zip \
     && rm -rf /var/lib/apt/lists/*
 
