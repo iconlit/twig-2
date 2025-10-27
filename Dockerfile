@@ -14,7 +14,7 @@ RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" &&
     composer install --no-dev --optimize-autoloader && \
     rm composer-setup.php
 
-# Copy the rest of your app
+# Copy all files
 COPY . .
 
 # Set Apache DocumentRoot to 'public'
