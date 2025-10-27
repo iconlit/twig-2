@@ -1,8 +1,14 @@
-# Use official PHP Apache image
 FROM php:8.2-apache
 
 # Enable Apache mod_rewrite
 RUN a2enmod rewrite
+
+# Install system dependencies: zip, unzip, git, and PHP extensions
+RUN apt-get update && apt-get install -y \
+    zip unzip git \
+    libzip-dev \
+    && docker-php-ext-install zip \
+    && rm -rf /var/lib/apt/lists/*
 
 # Set working directory
 WORKDIR /var/www/html
@@ -10,7 +16,7 @@ WORKDIR /var/www/html
 # Copy composer files first (for caching)
 COPY composer.json composer.lock /var/www/html/
 
-# Install dependencies and Composer
+# Install Composer and dependencies
 RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" \
     && php composer-setup.php --install-dir=/usr/local/bin --filename=composer \
     && composer install --no-dev --optimize-autoloader \
@@ -19,7 +25,7 @@ RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" \
 # Copy the rest of the app
 COPY . /var/www/html/
 
-# Set proper permissions for Apache
+# Set proper permissions
 RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 755 /var/www/html
 
@@ -29,5 +35,5 @@ RUN sed -i 's|/var/www/html|/var/www/html/public|g' /etc/apache2/sites-available
 # Expose port 80
 EXPOSE 80
 
-# Start Apache in foreground
+# Start Apache
 CMD ["apache2-foreground"]
